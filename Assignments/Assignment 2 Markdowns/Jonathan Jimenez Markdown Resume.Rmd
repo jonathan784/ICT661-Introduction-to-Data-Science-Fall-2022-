@@ -1,0 +1,39 @@
+---
+title: "Jonathan Jimenez CV"
+author: "Jonathan Jimenez"
+date: "2022-09-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Job Experiance
+*  _Technology Analyst_ __05/06/2022 - -08/21/2022__ ^[They work with quality assurance and quality control teams to develop processes, test procedures and implement systems that ensure the products and processes fulfill quality standards, meet safety regulations, and satisfy client expectations.]
+   *   Established testing, utilized Rally, reporting, and developed dashboards by gathering various existing automation artifacts. Created frameworks and scripts that tested the quality of products. 
+Converted legacy personal lines of insurance to Duck Creek on cloud.
+Discover vulnerabilities or security flaws to help our clients protect their information, applications, and business processes against cyber threats.
+Utilize programming skills to design and build client applications to drive and accelerate business impact.
+Build new business models via application management and implementation services.
+*  _ITS Assistant UKY_ __08/10/2021 - 05/05/2022__ ^[Information Technology Specialist]
+   * Assist students, faculty, and staff by providing technical support over the phone, email, and chat.
+ Manage multiple databases and services at once for the University of Kentucky and Hospital.
+ Helped users with online account management and troubleshoot technical problems.
+
+## Education
+*  _The University of Kentucky Bachelors _ __2017 - May 2021__:
+
+> Information Communication of Technology
+
+*  _The University of Kentucky Minor_ __2017 - May 2021__:
+
+> Business
+
+*  _The University of Kentucky Masters_ __2022 - May 2023__:
+
+> Information Communication of Technology
+
+******
+

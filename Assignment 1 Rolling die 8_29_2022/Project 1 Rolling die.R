@@ -37,8 +37,8 @@ roll <- function() {
   dice <- sample(die, size = 2, replace = TRUE)
   sum(dice)
 }
+roll()
 
-roll ()
 
 #Roll Bones
 roll2 <- function(bones = 1:6) {
@@ -58,9 +58,9 @@ roll2()
 install.packages("ggplot2")
 library("ggplot2")
 
-#qplot
+#QPLOT
 
-"x <- c(-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1)
+x <- c(-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1)
 x
 ## -1.0 -0.8 -0.6 -0.4 -0.2  0.0  0.2  0.4  0.6  0.8  1.0
 
@@ -70,9 +70,9 @@ y
 ##  0.064  0.216  0.512  1.000
 
 qplot(x, y)
-"
-"x <- c(1, 2, 2, 2, 3, 3)
-qplot(x, binwidth = 1)"
+
+x <- c(1, 2, 2, 2, 3, 3)
+qplot(x, binwidth = 1)
 
 
 
@@ -84,15 +84,15 @@ qplot(rolls, binwidth = 1)
 
 
 #SKEWING RESULTS
-"roll3 <- function() {
+roll3 <- function() {
   die <- 1:6
   dice <- sample(die, size = 2, replace = TRUE,  prob = c(1/8, 1/8, 1/8, 1/8, 1/8, 3/8))
   sum(dice)
 }
-roll3()"
+roll3()
 
 #SKEWING AND REPLICATING
-"rolls <- replicate(10000, roll())
-qplot(rolls, binwidth = 1)"
+rolls <- replicate(10000, roll())
+qplot(rolls, binwidth = 1)
 
 
