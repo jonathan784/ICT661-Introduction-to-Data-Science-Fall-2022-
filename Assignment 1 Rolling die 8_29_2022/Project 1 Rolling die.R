@@ -1,6 +1,10 @@
 # Jonathan Jimenez
 #Project 1 08/29/2022
 
+
+#PART 1 +2 
+
+
 die <- 1:6
 
 die * die
@@ -48,8 +52,14 @@ roll2 <- function(bones = 1:6) {
 
 roll2()
 
+
 #Extract functions - RStudio comes with a tool that can help you build functions. To use it, highlight the lines of code in your R script that you want to turn into a function. Then click Code > Extract
----------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
   
   
   #PART 3
