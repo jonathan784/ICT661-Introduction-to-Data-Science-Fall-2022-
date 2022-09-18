@@ -1,0 +1,60 @@
+---
+title: "ICT_LIS_661_Project_1"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Welcome to Project 1!
+
+# Project 1, Part 1: Your Dataset [5 points]
+
+> Tell me some about this dataset. Does it have a title? If not, what title would you give it? What reference or citation information (including a public URL, if applicable) can you provide about the dataset? Who created the dataset and when? How did they create it? [2 points]
+
+The title of the collected data is called "Pokemon and their stats." It was created by Shubham Chambhare on September 16, 2021. The collection of the data was acquired from several different sites, such as https://pokemondb.net/pokedex/all and https://www.serebii.net/pokedex-dp/stat/all.shtml. 
+This dataset includes 1045 Pokemons/observations, including their number, name, and basic stats/variables: HP, Attack, Defense, Special Attack, Special Defense, Total Power, and Speed (7 variables). The datasets' primary goal is to convey quantitative statistical data about each Pokemon. The data that has been collected is the raw attributes used for calculating how much damage an attack will do in games. With this data, I could determine the best Pokemon to use on another to win a duel.
+
+Dataset Reference - https://www.kaggle.com/datasets/shubhamchambhare/pokemons-and-there-stats?resource=download&select=pokemon.csv
+
+
+> What is your interest in this dataset? In general terms, what would you like to know about it? More specifically, what are some possible research questions that you could ask? Make sure that at least one of the research questions is *causal* in nature: That is, it asks about a cause-effect relationship. [3 points]
+
+
+As a child, I played Pokemon a lot, and being able to understand actual statistical data from each Pokemon sounds advantageous during a Pokemon battle. Being able to understand the differences in Pokemon will not only make me a better player, but allow me to see what makes each one "special."
+Research Questions
+Does the Pokemon with the highest stats in total win every duel?
+Does the "weakest" Pokemon lose every fight?
+Does the Pokemon with the highest health last the longest in duels?
+Do any Pokemon have an unfair advantage in any stat?
+Does a Pokemon that has a high attack also have high health?
+The Pokemon with the highest speed has low Health.
+
+# Project 1, Part 2: Reflect on Data Science [5 points]
+
+> Think back to what we learned about in Module 2 of class. How does your dataset relate to the phenomena of data science and big data? For example, is this the kind of data that was easily collected and readily available 50 years ago? Or is there something "new and shiny" about this data? [5 points]
+
+Pokemon was created in 1998 and quickly exploded into a franchise. When looking into the history of where the data was sourced from, it was clear to see that it was something "shiny and new." Pokemon was not available or even a thing 50 years ago. All the stats that have been collected are just made-up numbers that other people came up with. In my opinion, Pokemon itself is not "big data" but rather "made-up" individual instances that are edited, removed, and added when needed. The data that was collected is predefined and not at all "crowdsourced." Another way the data is considered "shiny and new" is that video games are based on it, allowing for reusability and reproducibility. By understanding the stats of each Pokemon, predictable outcomes of duels can be foreseen before they even happen, as the stats do not change.
+
+# Project 1, Part 3: Reflect on Data Privacy and Ethics [5 points]
+
+> As we discussed in Module 3, data scientists typically assume that the world works in consistent, predictable ways and that the point of data science is to figure out how the world works so that we can get the outcomes we want. There's nothing inherently wrong with these assumptions—they have served us well over the past couple of centuries, and they continue to do so. However, it's important to consider their limitations. Think about your dataset and your research questions; are there ways that what you're interested in doesn't quite fit the data science view of the world? [2 points]
+
+Yes, one of my research questions ask, "Does the Pokemon with the highest stats always win every duel?" While this can be answered from a data science point of view, other variables such as "dodged" and "missed" that happen randomly in-game may affect the results. By adding random variables into the game, the duel can not be predicted exactly as it is too vast and complicated to measure. Pokemon battles may be predefined numbers that add and subtract from each other, but "under the hood" there are different combinations of algorithms and probability that can change everything. Their are limitations to the data dempending on the point of veiw you may look at.
+
+> There's a lot of good that can be done with data—and a lot of bad that can be done with data. Think about your dataset and research questions. What kind of good could you do by analyzing those data? Is there any harm that a bad actor could do with those data? Are there ways that even well-meaning data scientists could accidentally do harm with those data? [3 points]
+
+By analyzing and understanding the dataset, people will appreciate the thought that went into creating each Pokemon. If a player is having difficulties understanding why one beats another, the dataset could be used to explain why in detail. The dataset describes statistical data that can be used to further someone else's knowledge of Pokemon. Another act of good that could come from the dataset could be simulated duels. By having the data of each Pokemon, different games and simulations of duels can be created with rights reserved to the owner, of course. While data is not wrong in itself, it could be used unethically. For example, simulations could be created that offer the user a selection of the best opponent to win. Before the battle even begins, one would already have an unfair advantage by using a third-party source. Well-meaning data could easily be used for harm unknowingly. For example, when a facial recognition device tested by a college student resulted in biased decision-making, the developers were shocked, to say the least. They did not intend to realize that facial recognition detected people of lighter skin more than those of dark or colored skin.
+
+# Project 1, Part 4: Reflect on Open Data [5 points]
+
+> Tell me about where you got your data from. How easy was it to find data that was of interest to you? What other kind of data did you find while looking for a dataset for this project? Could you have collected this data on your own if someone else hadn't done the work first? [2 points]
+
+When I first started my search, I decided to use Kaggle as I was familiar with it from my experience. I decided to look at the "all datasets" first to see what was available. The first might seem interesting, but when I looked at our discussion board, they were already taken. Some of the other datasets were "unpopular Spotify songs" and "Chocolate Bar Ratings." Another problem that I ran into was finding a data set that met all the requirements of 1000 observations and 10 variables. After some scrolling, I found something about Pokemon. I then did a field search on it and narrowed down my search. I believe if the dataset was not already created, I could have acquired it myself.
+
+> Sharing data is easy, but it's also easy to lose track of important information and context along the way. How much do you feel like you know about your dataset? Do you understand what all the variables mean? Do you know how it was collected? How well does the presentation of this dataset support the idea of data lifecycles? [3 points]
+
+I consider myself to be very familiar with the dataset, having interacted with it since I was a child allowed me to have experience . All the variables and their purposes are clear to understand, as they all play a role in a battle. The dataset was acquired from several different sites, such as https://pokemondb.net/pokedex/all and https://www.serebii.net/pokedex-dp/stat/all.shtml. In terms of data lifecycles, the data collected adheres to the guidelines. For example, if we were to follow plan, acquire, maintain, access, evaluate, archive, and quality assurance/quality control steps, then it is clear to see that the chosen dataset does follow the lifecycle. Kaggle does a good job of maintaining data, as each step previously explained can be seen/used when utilizing the application. The Kaggle application itself was intended for database collection, providing tools and support for all lifecycles.
