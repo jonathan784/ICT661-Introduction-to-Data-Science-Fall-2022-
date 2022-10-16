@@ -1,0 +1,162 @@
+---
+title: "ICT_LIS_661_Project_2"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Welcome to Project 2!
+
+Before moving on, please make a copy of this file and rename it in a way that makes a clear distinction between the original file and the file you'll eventually submit.
+
+> Under the headers below, I'll provide you with certain instructions, all of them formatted as blockquotes, like this paragraph is. Underneath each set of blockquoted instructions, you should write a (non-blockquoted) response to any questions I ask and fill out any code chunks as I instruct you. At the very end of this document, I'll provide instructions for *knitting* and submitting the `.Rmd` to Canvas.
+
+
+## Project 2, Part 1: Your Dataset [8 points]
+
+> For this project, you will need to identify a dataset with at least 100 observations and 5 variables. A dataset with at least 1,000 observations and 10 variables would be even better—but not necessary. It is fine for this to be a dataset that you have used previously in this class. This does not need to be a publicly available dataset, but please ensure that you can use the dataset legally and ethically. Store the data somewhere in your GitHub repository for this class.
+
+> In the code chunk below, please load the dataset into this document. (Keep in mind that you can—and may need to—install and load packages as part of this or any other code chunk). [2 points]
+
+Part one was not that difficult as we have been practicing this bit of code since the beginning of the class. At this point, it has become second nature to know how to read all types of data sets. The user can interpret their data set with ease using str().
+
+```{r}
+install.packages("tidyverse")
+install.packages("here")
+
+library(tidyverse)
+library(here)
+library(ggplot2)
+
+game <- read_csv(here("Assignments","Summarizing and Describing Data","imdb_video_game_rating.csv"))
+
+str(game)
+
+class(game)
+
+game
+
+```
+
+> Now that you've loaded the dataset, please tell me some about it. Does it have a title? If not, what title would you give it? What reference or citation information (including a public URL, if applicable) can you provide about the dataset? Who created the dataset and when? How did they create it? [2 points]
+
+The data set that I chose to focus on is publicly available on kaggle. The title of the data set is called "IMDB Video Games", and it was created by Muhammed Adil Talay in September, 2022. "The purpose of this data set is to gain insights into the trends of game genre popularity. As such, the data was collected from IMDB from the following nine genres of video games: action, adventure, comedy, crime, family, fantasy, mystery, sci-Fi, and thriller. The collected data consists of around 20K titles. (Talay, 2022).
+
+Link to open data set - https://www.kaggle.com/datasets/muhammadadiltalay/imdb-video-games
+
+
+
+> What is your interest in this dataset? In general terms, what would you like to know about it? More specifically, what are some possible research questions that you could ask? [2 points]
+
+I have always been interested in video games, and this assignment allows me to work on data that I have an interest in while advancing my technical skills as well. The data set has information on all types of video games created with a rating. By analyzing and modifying the data, I am hoping to find out what games are the most and least popular according to genre. That way, when I am deciding which games to play next, I would only be selecting from the "cream of the crop".
+
+Research Questions:
+Does the overall rating of games increase as time goes on?
+Are all the best-rated games made in the past?
+Are the best games made in the present day?
+Does a cretin genre average better scores than others?
+Does genre have an impact on ratings?
+What genre has the highest rating?  
+Which game has the highest rating?
+
+
+
+> As needed, perform any data cleaning (including "tidying") on the text in the code chunk below. [2 points]
+
+In this section of the project, I only had one issue. That issue was that when I was tying up the data, there was a column called "...1". This column was included in the data set to indicate "observation #" an observation was on. This confused me as the tidied data looked a bit funny and not right. After some digging around, I found out that it was part of the data set, so I simply did "select(-)". This syntax removes/ignores that whole column of observations. Another step that I took in this chunk was turning the "year" variable from a char to an int type. allowing tiding fiction to work with the data set.
+```{r}
+
+game_fil <- game %>%
+  select(-genre)%>%
+select(-directors)%>%
+  select(-plot)%>%
+  select(-...1)
+game_fil 
+
+#Making Numeric columns
+game$year <- as.integer(game$year)
+game_add <-game %>%
+mutate(yearplusrating = year + rating) %>%  mutate(yeartimesrating = year * rating)
+game_add$year <- as.integer(game_add$year)
+game_add
+
+game_fill_c <- game_fil
+
+  tidy_game <- game_fill_c %>%
+  pivot_longer(names_to = "Movie Variables", values_to = "Values", cols = -title, names_transform = list(year = as.numeric))
+  tidy_game
+
+```
+
+## Project 2, Part 2: Descriptive Statistics [12 points]
+
+> In the code chunk below, write code to determine the number of observations in the dataset. As is typical for R, there are a number of ways to do this—*how* you do so is less important than *that* you do so. [2 points]
+
+I did not use my tidy data set in this part of the project as it did not work as well as when I did it with non-tidied data. In this section, I chose to "count" and "tally" the number of observations with my own data set. This chunk counts before tidying the data.
+```{r}
+
+game %>% count(year)
+game %>% count(votes)
+game %>% count(...1)
+game %>% group_by(genre) %>% tally()
+
+```
+
+> In the code chunk below, write code to list the variables included in the dataset. Then, below the code chunk, list and explain 5-10 of the most important quantitative variables. (The quantitative part will become important in the next step!) 
+
+For this part of the assignment, I had to think outside the box as I had a major issue in front of me. My data set that I chose only had 3–4 quantitative values, and one of the variables only counted the "observation #" of an observation. Instead of throwing all of the work away, I instead decided to create two new numeric columns, as shown previously in our class with "mutate()". I then utilized this function to create two new columns called yeartimesrating and yearminusrating.
+
+```{r}
+#Not Added
+str(game)
+ls(game)
+#Added
+str(game_add)
+ls(game_add)
+```
+
+Quantitative Variables:
+..1 - Observation #
+Year - Release Year
+Rating - A rating og the observation 1 being the worst and 10 the best score.
+Votes - Total number of votes casted on a game
+yearminusrating = year - rating
+yeartimesrating = year * rating
+
+> In the code chunk below, calculate descriptive statistics (including mean, median, variance, and standard deviation) for each of the variables you listed above. Then, below the code chunk, describe what those descriptive statistics tell you about those variables. [3 points]
+
+During this part of the assignment, I did not have much experience besides implementing the right variables and standard deviation syntax. For example, I simply looked at the previous assignment that we did and inserted my corresponding variables with the standard deviation function added as well.
+
+```{r}
+game_add %>% group_by(genre) %>% summarize_at(vars( rating, votes, year, ...1, yeartimesrating, yearplusrating), list(~mean(.), ~median(.), ~sd(.)))
+
+```
+
+> Consider further questions that you have about the data and how visualization could help you answer those questions. In the code chunk below, pick one or more of the variables in your dataset and visualize them. Then, below the code chunk, describe what you were trying to learn about the data, what kind of plot you chose, why that plot is important for what you were trying to learn, and what the plot showed about the data. [4 points]
+
+For this part of the project, I chose to utilize the line graph with the year and rating variables. Choosing the line graph allows me to see a solid line that connects previous years to their ratings, visualizing a pattern throughout the time given. The purpose of choosing these variables was to solve three research questions that were illustrated above and below. By graphing these variables, a pattern can be seen that indicates new information on a large scale. The results of this data set that started in 1972 gradually improved as time went on , as indicated in the ggplot example.
+
+```{r}
+
+#As time goes on does the overall rating of games increase?
+#Are all the best rated games made in the past or present?
+# the best games made in the Present?
+  ggplot(data = game_add) + 
+    geom_smooth(mapping = aes(x = year, y = rating), color = "red", show.legend = FALSE)
+```
+
+
+# Submitting Project 2
+
+After you've completed all parts of this assignment to your satisfaction, click on the `Knit` button in the toolbar at the top of this pane. When/if prompted, please indicate that you wish to knit to an HTML file. Knitting to PDF or Word are fancy tricks but take some more setting up, and that's beyond the scope of this class. 
+
+After RStudio has finished knitting the file, it will bring it up in a special RStudio interface. You can use this interface to review the document and make sure that everything appears as you want. Then, however, you should navigate to the same folder where you have stored this `.Rmd` file, and you will find a `.html` file with the same name in that same folder. You can open that file to view this in your browser; more importantly, this is the file that you should submit to Canvas to complete this assignment.
+
+I cannot accept any submission of your work besides the knit `.html` file! If you are having trouble knitting, please get in touch with me instead of submitting the `.Rmd` file and hoping it will work instead. It won't. I don't have your data, I won't see your output, and I can't grade your work without either of those.
+
+Speaking of having your data, though, it would be nice to have access to all the work you've done in addition to the `.html` file. Please open GitHub desktop, navigate to your repository for this class, *commit* the changes that you've made in completing this project, and *push* those changes to GitHub. I will also ask you to do this if you need any help along the way.
