@@ -1,0 +1,189 @@
+---
+title: "ICT_LIS_661_Project_3"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Welcome to Project 3!
+
+Before moving on, please ensure that you have copied this file out of the GitHub repository where you found it and pasted it into a different folder before starting to make your own changes.
+
+> Under the headers below, I'll provide you with certain instructions, all of them formatted as blockquotes, like this paragraph is. Underneath each set of blockquoted instructions, you should write a response to any questions I ask and fill out any code chunks as I instruct you. At the very end of this document, I'll provide instructions for *knitting* and submitting the `.Rmd` to Canvas.
+
+## Project 3, Part 1: Your Text Data [6 points]
+
+> For this project, you will need to identify a text that contains a minimum of 5,000 words. This does not need to be a publicly available text, but please ensure that you can use the dataset legally and ethically. Store the data somewhere in your GitHub repository for this class.
+
+> In the code chunk below, please load the text into this document. (Keep in mind that you can—and may need to—load packages as part of this or any other code chunk). [2 points]
+
+In this step of the project, I had to direct the "computer" to where the data was located. Afterwards, it was imported into the RStudio for further analysis.
+```{r}
+
+library(textdata)
+library(tidyverse)
+library(tidytext)
+library(here)
+library(wordcloud)
+
+## -----------------------------------------
+## Loading in Data
+## -----------------------------------------
+
+book <- readLines(here("project_3", "pga28107.txt"))
+
+```
+
+> Now that you've loaded the test, please tell me some about it. Does it have a title? If not, what title would you give it? What reference or citation information (including a public URL, if applicable) can you provide about the text? Who created the text and when? How did they create it? What is your interest in it? [2 points]
+
+
+For this project, I decided to focus my attention on "The Happy Golfer, Being Some Experiences, Reflections, and a Few Deductions of a Wandering Golfer" by Henry Leach in 1874. It describes "the seven wonders of golf, and the abiding mystery of the game, with a thought upon traditions and their value" (Leach). The book was created by analyzing past events and experiences that are related to the game. For example, tournaments and the struggle within the game are covered, explaining the various "secrets" that the game withholds. My interest in this DF aligns with my hobby of playing gold. Recently, I have taken up golf, and understanding the "mysteries" may make me a better player overall.
+
+URL - https://www.gutenberg.org/ebooks/37136
+
+
+
+> As needed, perform any data cleaning (including "tidying") on the text in the code chunk below. [2 points]
+
+In this step of the project, the code starts by formatting the DF into a "tibble," which allows us to manipulate it to our needs. Afterwards, we create two variables that contain the "end" and "start" of our DF. Those two variables that were just created are then combined together to form "book_df." book_df is then modified by mutate and unest to give us the tidy data we want to conduct our analysis on. 
+
+```{r}
+## -----------------------------------------
+## Tidying Data
+## -----------------------------------------
+book_df <- tibble(text = book)
+
+book_start <- grep("/*/*/* START OF",book_df$text) + 1
+book_end <- grep("/*/*/* END OF",book_df$text) - 1
+
+book_df <- book_df[book_start:book_end,]
+
+tidy_book <- book_df %>% 
+  mutate(linenumber = row_number()) %>% 
+  unnest_tokens(word,text)
+
+```
+
+
+## Project 3, Part 2: Word Count [6 points]
+
+> In the code chunk below, please display a word count table listing the most common words in your text. [3 points]
+
+When creating a word count table, it is important to start off with good data. The DF (tidy book) chosen in this section was perfect as it indicated words as single observations. Any of the words that were exactly the same were counted together and sorted so that the most frequent words would be at the top. There was one problem with this practice, as many meaningless words would skew the end results. That is why I went took the extra step in adding stop-word functionality.
+
+```{r}
+## -----------------------------------------
+## Word Count
+## ----------------------------------------- 
+
+#With stop words
+tidy_book %>%
+  anti_join(stop_words) %>% count(word, sort = TRUE)
+
+#Without Stop words
+tidy_book %>% count(word, sort = TRUE)
+```
+
+
+> Below, please interpret your word count table. As part of your interpretation, make sure to include any implications of your findings for an analysis of the text. [3 points]
+
+In my opinion, I would choose the DF with the stop word functionality, as many of the words indicated in the results of the non-stop word function display redundant words that may have no meaning to the researcher. In doing so, my results came out more defined, as words related to golf would only appear in my results. Some of the words that were included are ball, play, club, hole, golf (which is surprising seeing as this is the fifth and not the first), stroke, and game. Ball is focused on so much throughout this DF that it almost doubles "second place." Now, when I look at only these words, I can interpret that this DF is about golf. The DF that utilized stop-word functionality displays information that can be utilized efficiently in an analysis over the other that displays meaningless information.
+
+
+## Project 3, Part 3: Sentiment Analysis [6 points]
+
+> In the code chunk below, prepare your text for sentiment analysis. [1 point]
+
+The next step in the process is sentiment analysis, which utilizes NRC and BING to distinguish specific data and add extra columns that calculate the values of a column as "sentiment" (positive or negative). Afterward, a graph is generated that depicts the data that was just modified. In the NRC method/DF, I chose to focus on "joy" topics as we have previously used them, and understanding the "joys" of golf will make it more appealing. Afterwards, they combine with "tidy_book," which also gives the word count sorted. A second analysis is done utilizing "BING," which limits itself to 80 linenumbers and adds an extra column that calculates the sum of the sentiment count of each observation. A graph is then generated, giving the user a visual of the "BING" method on a data set.
+
+```{r}
+## -----------------------------------------
+## Sentiment Analysis Examples
+## ----------------------------------------- 
+nrc_joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+
+tidy_book %>% inner_join(nrc_joy) %>% count(word, sort = TRUE)
+
+book_sentiment <- tidy_book %>% 
+  inner_join(get_sentiments("bing")) %>%
+  count(word, index = linenumber %/% 80, sentiment) %>% 
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+ggplot(book_sentiment,
+       aes(index, sentiment)) + geom_col(show.legend = FALSE)
+
+## -----------------------------------------
+## Sentiment Analysis Setup For next 2 questions
+## ----------------------------------------- 
+bing_word_counts <- tidy_book %>%
+  inner_join(get_sentiments("bing"))
+
+
+```
+
+> In the code chunk below, display the most common positive words in your text. [1 points]
+
+In this section of the project, I had to think outside the box as it combines three important functions. It first starts off by creating a DF utilizing the "inner_join" and "Bing" methods. Once the DF is created, it is then filtered so only the words that have been categorized as "positive" or "negative" will be shown. Along with the filtration function, a count of the frequency with which it appears in the DF is sorted from most apparent to least apparent. This can be very useful when you just want to know information quickly without manually reading it through.
+
+```{r}
+bing_word_counts_p <- bing_word_counts %>%
+  filter(sentiment == "positive") %>%
+  count(word, sentiment, sort = TRUE) 
+bing_word_counts_p
+
+```
+
+> In the code chunk below, display the most common negative words in your text. [1 points]
+
+In this section, where I had to find the "negative" words, I just had to change the variable names and keyword. The reason for changing the two variable names was because there could not be two of the same within one global environment. The keyword was changed from "positive" to "negative" as we are now changing our focus on what we want to analyze from the DF.
+
+```{r}
+bing_word_counts_n <- bing_word_counts %>%
+  filter(sentiment == "negative") %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+bing_word_counts_n
+```
+
+
+
+> Below, please interpret your sentiment analysis. As part of your interpretation, make sure to include any implications of your findings for an analysis of the text. [3 points]
+
+Within my sentimental analysis, I chose to focus on the "NRC" and "BING" methods. In the first analysis of NRC, I filtered out the words that relate to joy and combined them with "tidy_book." The result of this analysis provided only "joy" words in the DF such as good, green, kind, found, and success in that order. While many top words are joyful, I question "green." Although I do see how "green" is associated with being appealing as it signifies many desirable scenarios.
+In my second analysis, I chose the "BING" method and a graph to interpret. One thing I noticed was that the book starts neutrally, introducing golf, then suddenly drops in "sentiment" a little after line 100. If I had to hypothesize what this cause could be, I would imagine the book introducing challenges and conflict within the book and golf.
+
+
+
+## Project 3, Part 4: Text Data Visualization [2 points]
+
+> In the code chunk below, create at least one visualization related to your text. [2 points]
+
+The visualization practice that I chose to go with was a word cloud. The purpose was to further improve my understanding of new R functions. The word cloud was made with a 100-word limit, and the more frequently a word appeared, the bigger it would depict itself in the visual.
+
+```{r}
+library(wordcloud)
+
+tidy_book %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+```
+
+
+# Submitting Project 3
+
+After you've completed all parts of this assignment to your satisfaction, click on the `Knit` button in the toolbar at the top of this pane. When/if prompted, please indicate that you wish to knit to an HTML file. Knitting to PDF or Word are fancy tricks but take some more setting up, and that's beyond the scope of this class. 
+
+After RStudio has finished knitting the file, it will bring it up in a special RStudio interface. You can use this interface to review the document and make sure that everything appears as you want. Then, however, you should navigate to the same folder where you have stored this `.Rmd` file, and you will find a `.html` file with the same name in that same folder. You can open that file to view this in your browser; more importantly, this is the file that you should submit to Canvas to complete this assignment.
+
+I cannot accept any submission of your work besides the knit `.html` file! If you are having trouble knitting, please get in touch with me instead of submitting the `.Rmd` file and hoping it will work instead. It won't. I don't have your data, I won't see your output, and I can't grade your work without either of those.
+
+Speaking of having your data, though, it would be nice to have access to all the work you've done in addition to the `.html` file. Please open GitHub desktop, navigate to your repository for this class, *commit* the changes that you've made in completing this project, and *push* those changes to GitHub. I will also ask you to do this if you need any help along the way.
