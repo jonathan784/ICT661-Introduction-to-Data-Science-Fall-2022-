@@ -1,0 +1,220 @@
+---
+title: "ICT_LIS_661_Project_4"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Welcome to Project 4!
+
+Before moving on, please make a copy of this file and rename it in a way that makes a clear distinction between the original file and the file you'll eventually submit.
+
+> Under the headers below, I'll provide you with certain instructions, all of them formatted as blockquotes, like this paragraph is. Underneath each set of blockquoted instructions, you should write a response to any questions I ask and fill out any code chunks as I instruct you. At the very end of this document, I'll provide instructions for *knitting* and submitting the `.Rmd` to Canvas.
+
+## Project 4, Part 1: Your Dataset [6 points]
+
+
+> In the code chunk below, please load the dataset into this document. (Keep in mind that you can—and may need to—install and load packages as part of this or any other code chunk). [1 point]
+
+Part one was not that difficult, as we have been practicing this since the beginning of the class. At this point, it has become second nature to know how to read all types of data sets into R. The user can interpret the data set with ease using str() or summary(). I have loaded up all the packages that will be used in this project.
+
+```{r}
+library(here)
+library(tidyverse)
+library(infer)
+library(moderndive)
+library(nycflights13)
+library(ggplot2movies)
+library(ggplot2)
+
+## -----------------------------------------
+## Loading in Data
+## -----------------------------------------
+
+game <- read_csv(here("project_4","imdb_video_game_rating.csv"))
+
+
+str(game)
+
+class(game)
+
+game
+
+```
+
+
+> As needed, perform any data cleaning (including "tidying") on the text in the code chunk below. [1 point]
+
+The first part of the preparation for this project was changing the meta data for the year variable. Changing the meta data to a numeric format for analysis I also included "na.omit" so that way no "NA" would appear while working with the data set. In this section, I created four data sets that have been modified to make them easier to interpret and analyze by excluding unnecessary information. The data frames were created for separate purposes that include line-regression, descriptive statistics, and t-test analysis. Within the DF's of the descriptive statistical analysis, I filtered out one categorical variable in preparation.
+
+```{r}
+game$year = as.numeric(as.character(game$year))
+
+game %>%
+  na.omit()
+
+game_fil <- game %>%
+  select(-plot) %>%
+  select(-directors) %>%
+  select(-year) %>%
+  select(-title) %>%
+  select(-...1) %>%
+  select(-votes)%>%
+  filter(genre == c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+game_fil
+
+game_fil_reg <- game %>%
+  select(-plot) %>%
+  select(-directors) %>%
+  select(-...1) %>%
+  select(-votes)
+game_fil_reg
+  
+  game_fil_drama <- game_fil %>%
+  filter(genre == "Action, Adventure, Drama")
+
+  game_fil_fantasy <- game_fil %>%
+   filter(genre == "Action, Adventure, Fantasy")
+
+```
+
+
+> In the code chunk below, write code to list the variables included in the dataset. Then, below the code chunk, list and explain 2-5 variables that you expect to explore with t-tests and regressions. [1 point]
+
+In this step of the project, I used three forms of listing, as each one provides information in a different manner that may be desired by different researchers.
+
+```{r}
+str(game_fil)
+ls(game_fil)
+summary(game_fil) 
+```
+
+
+
+> In the code chunk below, calculate descriptive statistics (including mean, median, variance, and standard deviation) for each of the variables you listed above. Then, below the code chunk, describe what those descriptive statistics tell you about those variables. [3 points]
+
+In this part of the project, I made three different descriptive analyses. In the first method, I am focusing on the categorical variable "action, adventure, drama." Within this method, a table is produced depicting the mean, median, standard deviation, and variance. In the second method, I am focusing on the categorical variable "action, adventure, fantasy." Within this method, a table is produced depicting the mean, median, standard deviation, and variance. In the third method, I am focusing on all the categorical variables combined. Within this method, a table is produced depicting the mean, median, standard deviation, and variance overall.
+
+
+```{r}
+#Descriptive Stats for "Action, Adventure, Drama"
+game_fil_drama_dis <- game_fil_drama %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_drama_dis
+
+#Descriptive Stats for "Action, Adventure, Fantasy"
+game_fil_fantasy_dis <- game_fil_fantasy %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_fantasy_dis
+
+#All Descriptive Stats
+game_fil_all_dis <- game_fil %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_all_dis
+
+
+```
+
+
+
+## Project 3, Part 2: T-Test [6 points]
+
+> For this part of the project, you will be carrying out a t-test. Please recall that the purpose of a t-test is to compare two means!
+> Below, please describe a set of hypotheses (both null and alternative) related to this data that can be tested using a t-test. [2 points]
+
+For my hypothesis I am focusing on genres of games and their ratings to see if there is any pattern.
+
+### Hypotheses
+H0: Genres have no effect on game ratings.
+HA: Genres affect game ratings.
+
+### Data Analysis
+
+> In the code chunk below, please carry out a t-test that will test the hypotheses listed above. Then, below the code chunk, summarize the results of this analysis. Make particular reference to relevant statistics, including t-value and p-value (statistical significance). [3 points]
+
+For this part of the project, I understood that I was using only two categorical variables, which allowed me to use the "independence" method. I also included a "reps = 1000" and "type permute" to generate random scenarios that we can compare without having to do them ourselves 100 times. This gives us a clear image of the "big picture." Since I am also utilizing numeric values in my operations, "diff in means" is the ideal stat syntax to use in my case. I also included a visual representation of the t-tests. After analysis of the t-test with regards to the hypothesis, we would reject the null hypothesis as the p-value is below our pre-specified level of a = 0.05. Another notable result was when I ran "obs_diff_means - game_fil%>% specify(rating genre)%>% calculate (stat = "diff in means", order = c("Action, Adventure, Drama", "Action, Adventure, Fantasy"), which returned.588. Having an almost 60 percent difference is pretty big, but with these observations, I noticed the two categorical variables are not equal in count. One of the categorical variables has many more observations, which makes me wonder if this has anything to do with it. When looking at the p-value of 0 it indicates we would reject the null hypothesis. This P value indicates that if the genre had no effect, you’d obtain the observed difference or more in 0% of studies due to random sampling error.
+
+```{r}
+null_distribution <- game_fil %>% 
+  specify(formula = rating ~ genre) %>% 
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+ null_distribution
+
+ obs_diff_means <- game_fil %>% 
+   specify(rating ~ genre) %>% 
+   calculate(stat = "diff in means", order = c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+ obs_diff_means
+ 
+ visualize(null_distribution, bins = 10)
+
+visualize(null_distribution, bins = 10) + 
+  shade_p_value(obs_stat = obs_diff_means, direction = "right")
+
+null_distribution %>% 
+  get_p_value(obs_stat = obs_diff_means, direction = "right")
+
+
+```
+
+
+
+### Conclusions
+
+> Below, interpret the results of this analysis (that is, describe what the results mean for your data). Please also discuss any practical implications of these results (that is, explain how people might wish to think or act differently based on these results). [1 points]
+
+After looking at the results, I would reject the null hypothesis as my p-value is below the pre-specified level of a=.005. This would mean we would reject the idea that genres have no effect on game ratings. thus accepting the idea that genres affect game ratings overall. One theory that I have for why this result came to be is by looking at the observation count. When looking at the observations closely, I noticed that there are many more "action, adventure, and fantasy" observations than "action, adventure, and drama" observations in the DF.
+
+
+
+## Project 3, Part 3: Regression [8 points]
+
+> For this part of the project, you will be carrying out a regression. Please recall that the purpose of regression is to describe the relationship between two (or more) variables!
+> Below, please describe a set of hypotheses (both null and alternative) related to this data that can be tested using regression. [2 points]
+
+### Hypotheses
+
+HO: Year of game has no affect on the rating.
+HA: Year of game has an affect on the rating.
+
+### Data Analysis
+
+> In the code chunk below, please carry out a regression that will test the hypotheses listed above. Then, below the code chunk, summarize the results of this analysis. Make particular reference to relevant statistics, including beta (coefficient), t-value and p-value (statistical significance). [4 points]
+
+In this process of the project, we are trying to draw a "line" that indicates the pattern of the DF overall. We obtained a coefficient of.1526 using our example. This number indicates that there is a positive trend or pattern in the DF. This positive trend indicates that as one goes up, the other will follow, statistically speaking. When looking at the p-value, we found 0, which indicates that if the game genre had no effect, you’d obtain the observed difference or more in 0% of studies due to random sampling error.
+
+```{r}
+#cor()
+game_fil_reg %>% na.omit() %>%
+  get_correlation(formula = year ~ rating)
+
+
+
+#Graph
+ggplot(game_fil_reg, aes(x = year, y = rating)) +
+  geom_point() +
+  labs(x = "Year", 
+       y = "Game Rating",
+       title = "Relationship Scatterplot of Year and Ratings")+
+        geom_smooth(method = "lm", se = FALSE)
+
+#Regression Table
+# Fit regression model:
+fit_model <- lm(year ~ rating, data = game_fil_reg)
+# Get regression table:
+get_regression_table(fit_model)
+
+#R^2
+summary(fit_model)
+```
+
+### Conclusions
+
+> Below, interpret the results of this analysis (that is, describe what the results mean for your data). Please also discuss any practical implications of these results (that is, explain how people might wish to think or act differently based on these results). [2 points]
+
+After conducting the line regression processes for this project, we would reject our null hypothesis. Looking at the correlation value we get, 152, which indicate a positive trend in our DF. This positive trend indicates that the average rating is increasing as the year progresses as well. Another indication that we reject the null hypothesis is the p-value. Since our P-value is 0 and below our predetermined level of a = 0.05, we would not reject our alternative hypothesis. After conducting our analysis, we determined that the year of the game has an effect on the rating. One theory that I have for this is that games are better developed now than they were back then. This development increased the entertainment value, which also affected the users' satisfaction and rating.
