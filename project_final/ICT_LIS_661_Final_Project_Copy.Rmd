@@ -1,0 +1,304 @@
+---
+title: "ICT_LIS_661_Final_Project"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem Statement [5 points]
+
+> Describe the data problem(s) you are addressing and what research questions related to the problem(s) you are asking. [3 points]
+
+Data Problem(s): Do games "improve" overall as the years advance?
+
+Research Question: Does the year in which a video game was released or created affect its rating?
+
+> Provide some contextual information related to the problem(s). [2 points]
+
+If I were a new "gamer" and wanted to play the "best games," I would want to know if the older generations were better than the new ones. Understanding this question will put into perspective whether time has improved or worsened the quality of games overall. Spending endless hours playing non-enjoyable games seems like a waste of time, and through this analysis, we will uncover if it is worth it to stick with the newer or older generations. There are many gamers out there who are always asking the age-old question of what is the best game, and by narrowing it down to the years in which a game was released,  can help them decide what to play next. Another aspect to consider is the technology used in the development of the game. Technology is always advancing, and with its help, video games may improve or deteriorate in the process. This study's data set will include eight variables from IMDB-rated video games. These variables were chosen because they encompass all aspects of each video game. While the data has been collected, it is not organized in a way that researchers could look at it and interpret it at a glance.
+
+
+# Data Description, Preparation, and Exploration [10 points]
+
+> In the code chunk below, run all the code necessary to respond to the questions below; please note that this should include at least one visualization! [2 points]
+
+```{r}
+library(tidyverse)
+library(readr)
+library(moderndive)
+library(skimr)
+library(here)
+library(dplyr)
+library(infer)
+library(moderndive)
+library(ggplot2movies)
+library(tidyverse)
+library(here)
+library(ggplot2)
+
+game <- read_csv(here("project_final","imdb_video_game_rating.csv"))
+game$year <- as.integer(game$year)
+class(game)
+game
+
+#Loading and Exploring Our Data
+#Selecting specific variables 
+game_reg <- game %>%
+  select(year, rating)
+
+#Graph
+ggplot(game_reg, aes(x = year, y = rating)) +
+  geom_point() +
+  labs(x = "Year", 
+       y = "Game Rating",
+       title = "Relationship Scatterplot of Year and Ratings")+
+        geom_smooth(method = "lm", se = FALSE)
+
+#Descriptive Statistics 
+
+#Regression Table
+# Fit regression model:
+fit_model <- lm(rating ~ year, data = game_reg)
+# Get regression table:
+get_regression_table(fit_model)
+
+
+#R^2
+summary(fit_model)
+
+game_reg %>% skim()
+
+#cor()
+game_reg %>% na.omit() %>%
+  get_correlation(formula = year ~ rating)
+
+glimpse(game_reg)
+summary(game_reg)
+str(game_reg)
+
+game_rating_dis <- game_reg %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_rating_dis
+
+
+```
+
+> Describe your dataset, including a reference, a description of the data collection procedure, and its size (number of observations and variables). [2 points]
+
+The data set that I chose to focus on for this final project is called "imdb_video_game_rating.csv." It is a collection of video games rated by the IMDB from 1948 to 2017. "The data was scraped from imdb.com," with 12637 unique observations created or released. The collection contains the titles, year, genre, rating, votes, director, and plot. The rating system used in the data set is on a scale of 1–10, with 1 being the worst and 10 being the best. The rating is determined by the average score of all the votes in that observation. There are multiple genres in the genre category, but with the outstanding number of observations, each genre has more than enough.
+
+> Explain how you imported and manipulated the data for analysis. [2 points]
+
+When I imported the data, I used "read.csv" to read the file I had in the folder of the wording directory. I first had to change the year variable to numeric and omit any NA possibility. After that, I created another DF with only the year and rating variables that will be used in the line regression analyses. Once I had the desired DF, I created a graph using "ggplot2" and "gemo_smooth" to make a visual line regression analysis. Afterward, I created multiple descriptive statistic codes to give me all the information I could need. The information I produced told me the correlation coefficient, standard deviation, mean, median, variance, and multiple R squared.
+
+> Provide the description of key variables and their descriptive statistics. What do these descriptive statistics tell you about the data? [2 points]
+
+The key variables that I kept a close eye on during the line regression analysis were year and rating. The descriptive analysis of these two variables yielded a correlation coefficient of.1527, a multiple squared R of 0.0233, the mean and median of the year 2005, the mean and median of the rating at 6.945 and 7.200, respectively, and a standard error of 2.
+With the correlation coefficient being over 0, it indicates that there has been a positive trend or pattern over the years and within the DF. As time progresses, the data shows that the rating of games overall increases as the years pass. While this may be the case, the Multiple Squared R indicates that 2.3% of the variance in the ratings can be explained by the years advancing. Having a standard error of 2 also indicates that we can be 95% confident that our observed sample mean is plus or minus roughly 2 standard errors from the "total mean." As a result of the descriptive statistics analysis, I have concluded that games do get or are "better" as the years go on, but only 2.3% of the reasoning is because of the years that pass. So if I were a new gamer and wanted to play the best possible games I could without wasting my time, I would choose the newer games as they only get better (according to the coefficient). 
+
+> Explain how you visualized the data, why you chose that visualization, and what it tells you about the data. [2 points]
+
+When I visualized the data, I first noticed that the DF had "years" and "rating" as numeric variables. After some deliberation, I came to the conclusion that if I wanted to test two variables and see the overall progress, the linear regression test would do just that. I thought a line regression would work the best, as it can take all the data and "spit out" a graph that depicts a line in a positive or negative direction. This direction would provide the researcher with information and statistical statistics that would have been difficult to obtain by hand. The graph indicated a line going upwards (a positive direction), which means as the years increase, the average rating will increase as well.
+
+# Hypotheses [5 points]
+
+> In the code chunk below, run all the code necessary to respond to the questions below. Please note that it is not necessary to run any analyses in this part of the project, so you may not need to run any code here. This is here just in case you do!
+
+```{r}
+#Genre Hypothesis #1
+game_fil <- game %>%
+  select(-plot) %>%
+  select(-directors) %>%
+  select(-year) %>%
+  select(-title) %>%
+  select(-index) %>%
+  select(-votes)%>%
+  filter(genre == c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+game_fil
+
+  
+  game_fil_drama <- game_fil %>%
+  filter(genre == "Action, Adventure, Drama")
+
+  game_fil_fantasy <- game_fil %>%
+   filter(genre == "Action, Adventure, Fantasy")
+#################################################################################################################
+
+#Year Hypothesis #2
+  game_year <- game %>%
+  select(-plot) %>%
+  select(-directors) %>%
+  select(-genre) %>%
+  select(-title) %>%
+  select(-index) %>%
+  select(-votes)%>%
+  filter(year == c(2020,1990))
+game_year
+
+game_fil_2020 <- game_year %>%
+  filter(year == 2020)
+
+game_fil_1990 <- game_year %>%
+  filter(year == 1990)
+
+```
+
+> Describe at least four research hypotheses you wish to test, and explain each hypothesis in detail—in terms of the variables identified above. [5 points]
+
+### Hypotheses
+
+### Hypotheses #1
+
+HO: Genre of game has no affect on the rating.
+HA: The genre of a game has an effect on the rating.
+#Explination
+H0: For my null hypothesis, I predicted that different types of genres ("action, adventure, drama") and "action, adventure, fantasy") have no affect on game ratings.
+HA: For my alternative hypothesis, I predicted that different types of genres ("action, adventure, drama") and "action, adventure, fantasy") have an effect on game ratings.
+
+### Hypotheses #2
+
+HO: The year of the game has no effect on the rating.
+HA: Year of game has an affect on the rating.
+Explanation 
+HO: For my null hypothesis I predicted that the year (2020,1990) in which the game was created/released have no affect on game ratings.
+HA: For my alternative hypothesis, I predicted that the year (2020, 1990) in which the game was released or created would have an effect on game ratings.
+
+# Analysis Methods [10 points]
+
+> Describe your data analysis methods for testing your hypotheses. [5 points]
+
+The method that I chose to focus on is the t-test method. Since I am testing two groups or samples for all of my hypotheses and want to find out if it has an effect on the results or rating, the t-test will be perfect. It compares the means of each group and determines whether it actually has an effect on the "population of interest." By utilizing the t-test analysis method, we will be able to determine a p-value that will indicate if we are 95% confident that the estimate will fall within the upper and lower values specified by the confidence intervals. For example, if the p-value obtained in the study fell within +/-.05 of a predetermined level, we would "reject" or "not reject" the null hypothesis.If we do "reject" the null hypothesis due to the results, then we would "not reject" the alternative hypothesis.
+The process of the analysis started off with creating the desired DF with specific variables and groups. This was accomplished with the above code chunk. I also specifically filtered out two groups in each of the dependent variables so that the results were unaffected by the other groups.After the tiding was done, I then proceeded with the t-test. For the t-test, I used a formula that had genre as the dependent variable and rating as the independent variable. While also utilizing the "independent setting" (for 2 samples), the "permute setting" (replace), and replicating it 1000 times to find the "difference in means" between 2 sets of hypotheses (2020, 1990, and "Action, Adventure, Drama," "Action, Adventure, Fantasy," respectively). I then took the result of the t-test and created a visual with "bins". This visual also includes a line that indicates the "difference in the means" on a scale from 1 to 10.
+
+> Explain why those data analysis methods are useful for testing your hypotheses. [5 points]
+
+For starters, our hypotheses are contradictory to each other, which means to identify which hypothesis to "reject," a t-test would be the perfect solution. Not to mention that we only have two groups in our DF. "A t-test is an inferential statistic used to determine if there is a significant difference between the means of two groups and how they are related." With a t-test, we would be able to receive a p-value that indicates the "probability of the occurrence" and if the dependent variables (years and genre) actually had an effect on the independent variable (rating). The test would take the two variables and test or replicate them 1000 times. That way we could compare our observed sample against the "true" or "population" mean.
+
+
+# Results and Discussion [20 points]
+
+> In the code chunk below, run all the code necessary to carry out the analyses described above. [8 points]
+
+```{r}
+#Genre Hypothesis #1
+
+null_distribution <- game_fil %>% 
+  specify(formula = rating ~ genre) %>% 
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+ null_distribution
+
+ obs_diff_means <- game_fil %>% 
+   specify(rating ~ genre) %>% 
+   calculate(stat = "diff in means", order = c("Action, Adventure, Drama", "Action, Adventure, Fantasy"))
+ obs_diff_means
+ 
+ visualize(null_distribution, bins = 10)
+
+visualize(null_distribution, bins = 10) + 
+  shade_p_value(obs_stat = obs_diff_means, direction = "right")
+
+null_distribution %>% 
+  get_p_value(obs_stat = obs_diff_means, direction = "right")
+
+#############################################################################################################
+#Year Hypothesis #2
+
+game_year$year = as.character(as.numeric(game_year$year))
+
+null_distribution_2 <- game_year %>% 
+  specify(formula = rating ~ year) %>% 
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c(2020,1990))
+ null_distribution_2
+
+ obs_diff_means <- game_year %>% 
+   specify(rating ~ year) %>% 
+   calculate(stat = "diff in means", order = c(2020,1990))
+ obs_diff_means
+ 
+ visualize(null_distribution, bins = 10)
+
+visualize(null_distribution, bins = 10) + 
+  shade_p_value(obs_stat = obs_diff_means, direction = "right")
+
+null_distribution %>% 
+  get_p_value(obs_stat = obs_diff_means, direction = "right")
+
+#############################################################################################################
+
+#Descriptive Stats for "Action, Adventure, Drama"
+game_fil_drama_dis <- game_fil_drama %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_drama_dis
+
+#Descriptive Stats for "Action, Adventure, Fantasy"
+game_fil_fantasy_dis <- game_fil_fantasy %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_fantasy_dis
+
+#All Descriptive Stats
+game_fil_all_dis <- game_fil %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_all_dis
+
+###############################################################################################################
+#Year Hypothesis 
+#Descriptive Stats 2010
+game_fil_2020_dis <- game_fil_2020 %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_2020_dis
+
+#Descriptive Stats 1990
+game_fil_1990_dis <- game_fil_1990 %>%
+  summarize(mean_rating = mean(rating), median_rating = median(rating), Variance_rating = var(rating), standard_deviation_rating = sd(rating))
+game_fil_1990_dis
+```
+
+
+> Interpret the results above. [4 points]
+
+### Hypothesis #1
+
+HO: Genre of game has no affect on the rating.
+We would reject the null hypothesis.
+HA: The genre of a game has an effect on the rating.
+We would not reject the alternative hypothesis.
+
+We resurrected a P-value of 0, which is less than our predetermined level of.05.Because our p-value is below the predetermined level, it indicates that we are not 95% confident that it would have the same effect on the "true/population mean." Since it does not meet our standards, we would "reject" the null hypothesis and "not reject" our alternative hypothesis. By looking at our difference in mean, we revived.569, which is not a drastic difference on a scale of 1 to 10, but there is a big separation and difference when looking at the visual graph that represents a test done 1000 times. In the end, one genre is better than another. resulting in "not rejecting" the idea that ratings are affected by genres.
+
+### Hypotheses #2
+
+HO: The year of the game has no effect on the rating.
+We would reject the null hypothesis.
+HA: Year of game has an affect on the rating.
+We would not reject the alternative hypothesis.
+
+When looking at the year's set of hypotheses, we receive a P-value of 0. Since we receive a P-value of 0, we would reject our null hypothesis as 0 is below our predetermined level of.05. With the value being outside the 95% confidence interval, we would "not reject" our alternative hypothesis. With that being said, it is concluded that one year is better than another. resulting in "not rejecting" the idea that ratings are affected by years.
+
+> Discuss any practical implications of your results. [4 points]
+
+There are many practical uses for this research in terms of video game development and enjoyment. For example, if a new gamer wanted to find out what "era" of video games is "the  best," this research would enlighten them. By understanding that years have an effect on video game ratings, it is clear to see that the newer games (more recent games created or released) would provide a better experience than the ones that have come before. That way, the new gamer will not have to spend hours of time playing video games that are not as enjoyable. With the results I have discovered, it is clear to see that years and time have an effect, and "better" games are created and released as the years increase. Another use for this information would be understanding how genres affect ratings as well. One scenario would be a game developer trying to figure out what genre of game they should make: "action, adventure, drama" or "action, adventure, fantasy." If their goal is to have a higher rating in terms of the statistical results, picking a specific genre would certainly help their efforts.
+
+
+> Describe any limitations of your data analyses. [4 points]
+
+With my data analysis, I did notice some limitations. The first limitation that I encountered was how it only "tests" two groups. Since the test could only process two groups, I had to filter the original DF until I had what I desired. The original DF had multiple groups, so I had to limit the amount present in the test. In my imagination, being able to test all genres and groups would have provided a "clearer" picture than just testing two. Another aspect of the results was that while it may tell you if one variable affects another, it does not tell you what specific year or genre is the "best." That would require a different test.
+In terms of the year, the same follows. As we may be able to tell that years have an effect on rating, we could only test two groups. which means I had to limit the DF and select two years or groups to test instead of all the years at once. In my opinion, testing all the years would provide a better understanding, but I also do not know if that is possible. While we are able to come to a conclusion (reject or not reject) based on our hypothesis and results, this does not give us an answer as to what specific year was or is the "best." The analysis is not meant to be a guild on how to create or play video games as it is a cultivation of multiple people's opinions, so while one genre may be highly rated, it is not a guarantee that the newly created game in that genre will also be highly rated just because it is in the same category.
+
+
+# Submitting the Project
+
+After you've completed all parts of this assignment to your satisfaction, click on the `Knit` button in the toolbar at the top of this pane. When/if prompted, please indicate that you wish to knit to an HTML file. Knitting to PDF or Word are fancy tricks but take some more setting up, and that's beyond the scope of this class. 
+
+After RStudio has finished knitting the file, it will bring it up in a special RStudio interface. You can use this interface to review the document and make sure that everything appears as you want. Then, however, you should navigate to the same folder where you have stored this `.Rmd` file, and you will find a `.html` file with the same name in that same folder. You can open that file to view this in your browser; more importantly, this is the file that you should submit to Canvas to complete this assignment.
+
+I cannot accept any submission of your work besides the knit `.html` file! If you are having trouble knitting, please get in touch with me instead of submitting the `.Rmd` file and hoping it will work instead. It won't. I don't have your data, I won't see your output, and I can't grade your work without either of those.
+
+Speaking of having your data, though, it would be nice to have access to all the work you've done in addition to the `.html` file. Please open GitHub desktop, navigate to your repository for this class, *commit* the changes that you've made in completing this project, and *push* those changes to GitHub. I will also ask you to do this if you need any help along the way.
